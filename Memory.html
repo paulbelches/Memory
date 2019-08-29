@@ -6,34 +6,48 @@
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
   </head>  
-  <body>
+  <body color="red">
     <div id="root"></div>
     
     <script type="text/babel">
       class Card extends React.Component {
         render() {
           const style = {
-            backgroundColor: 'red',
+            backgroundColor: '#ffffff',
             width: '100%',
             height: '100%',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            position:'relative'
+            /*
+            borderStyle: 'solid',
+            borderWidth: '10px',
+            borderColor: '#01a0dd',
+            borderRadius: '20px'*/
           }
           const styleImage = {
-            backgroundColor: 'blue',
-            width: '80%',
-            height: '80%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            width: '200px',
+            height: '300px',
+            top:'0px',
+            left:'0px',
+            position:'absolute',
+            zIndex: '0'
+          }
+          const styleImageBack = {
+            width: '200px',
+            height: '300px',
+            top:'0px',
+            left:'0px',
+            position:'absolute',
+            zIndex: '1'
           }
           return (
-            <div style={style} tabIndex={0}>
-              <div style={styleImage} tabIndex={0}>
-                <p> {this.props.value} </p>
+              <div style={style}>
+                <img style={styleImageBack} src="back.png"/> 
+                <img style={styleImage} src={this.props.value}/> 
               </div>
-            </div>
+              
           )
         }
       }
@@ -43,18 +57,15 @@
           super(props)
           
           this.state = {
-            values:[1,2,3,4,5,1,2,3,4,5] 
+            values:["brazoIz.png","brazoIz.png","brazoDe.png","brazoDe.png", "cabeza.png",
+            "cabeza.png", "piernaIz.png", "piernaDe.png", "piernaIz.png", "piernaDe.png"] 
           }
         }
-        /*
-        renderCard(i) {
-          return <Card enemyPosition={}/>
-        }*/
+
 
         render() {
           const style = {
-            backgroundColor: 'purple',
-            width: '1500px',
+            width: '1300px',
             height: '700px',
             position: 'relative',
             display: 'grid',
