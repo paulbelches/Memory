@@ -8,42 +8,58 @@
   </head>  
   <body color="red">
     <div id="root"></div>
-    
+    <style>
+      body {
+        background-image: url("space.jpg");
+        background-repeat: no-repeat;
+        background-color: #183487;
+      }
+      @font-face {
+    font-family: "matrix";
+    src: url("Korean_Calligraphy.ttf");
+}
+    </style>
     <script type="text/babel">
+     
       class Card extends React.Component {
         render() {
           const style = {
-            backgroundColor: '#ffffff',
             width: '100%',
             height: '100%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            position:'relative'
-            /*
-            borderStyle: 'solid',
-            borderWidth: '10px',
-            borderColor: '#01a0dd',
-            borderRadius: '20px'*/
-          }
+            position:'relative',
+            transform:  `${this.props.rotation}`,
+            transformStyle: "preserve-3d",
+            transition:"all .4s ease-in-out",
+            
+           }
           const styleImage = {
-            width: '200px',
-            height: '300px',
+            width: '150px',
+            height: '225px',
             top:'0px',
             left:'0px',
             position:'absolute',
-            zIndex: '0'
+            zIndex: '0',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backfaceVisibility: 'visible'
           }
           const styleImageBack = {
-            width: '200px',
-            height: '300px',
+            width: '150px',
+            height: '225px',
             top:'0px',
             left:'0px',
             position:'absolute',
-            zIndex: '1'
+            zIndex: `${this.props.index}`,
+            justifyContent: 'center',
+            alignItems: 'center',
+            transform: 'rotateY(180)',
+            backfaceVisibility: 'hidden'
           }
           return (
-              <div style={style}>
+              <div id={this.props.id} onClick={this.props.clicker} style={style}>
                 <img style={styleImageBack} src="back.png"/> 
                 <img style={styleImage} src={this.props.value}/> 
               </div>
@@ -57,33 +73,135 @@
           super(props)
           
           this.state = {
+            cont : 0,
+            moving: false,
+            lastPick: -1 ,
+            correcta: 0,
+            gano:"hidden",
+            movimientos:0,
+            textoMovimientos:"Movimientos: ",
             values:["brazoIz.png","brazoIz.png","brazoDe.png","brazoDe.png", "cabeza.png",
-            "cabeza.png", "piernaIz.png", "piernaDe.png", "piernaIz.png", "piernaDe.png"] 
+            "cabeza.png", "piernaIz.png", "piernaDe.png", "piernaIz.png", "piernaDe.png",
+            "ra.jpg","ra.jpg","slifer.jpg","slifer.jpg","obelisk.jpg","obelisk.jpg"] ,
+            index:[1,1,1,1,
+            1,1,1,1,
+            1,1,1,1,
+            1,1,1,1],
+            rotation:["rotateY(0deg)","rotateY(0deg)","rotateY(0deg)","rotateY(0deg)",
+            "rotateY(0deg)","rotateY(0deg)","rotateY(0deg)","rotateY(0deg)",
+            "rotateY(0deg)","rotateY(0deg","rotateY(0deg)","rotateY(0deg)",
+            "rotateY(0deg)","rotateY(0deg)","rotateY(0deg)","rotateY(0deg)"]
           }
         }
 
+        componentDidMount(){
+          let v = []
+          for (let i = 0; i< 16; i++){
+            v.push(this.state.values.splice(Math.floor(Math.random()*this.state.values.length),1))
+          }
+          console.log(v)
+          this.setState({values: v})
+        }
+        
+        voltearDeRegreso(a,b){
+          console.log("Incorrecta");
+          this.state.rotation[a] = "rotateY(0deg)"
+          this.state.rotation[b] = "rotateY(0deg)"
+          this.state.lastPick = -1
+          let i = this.state.rotation
+          this.setState({rotation:i})
+        }
+        
+        handleClick(c){
+          if (!this.state.moving)
+            if (this.state.cont < 2){
+              //Update index (rotación)
+              this.state.rotation[c-1] = "rotateY(180deg)"
+              let i = this.state.rotation
+              this.setState({rotation:i})
+              this.state.cont = this.state.cont + 1
 
+              if (this.state.lastPick == -1){
+                this.state.lastPick = c-1
+              } else {
+                  this.state.cont = 0
+                  this.state.movimientos = this.state.movimientos + 1
+                  let text = "Movimientos: "+ this.state.movimientos
+                  this.setState({textoMovimientos:text})
+                  console.log(this.state.textoMovimientos)
+                  if (this.state.values[this.state.lastPick][0] == this.state.values[c-1][0]){
+                    setTimeout(async function(){ console.log("Correcta"); }, 1000);
+                    this.state.correcta = this.state.correcta + 1
+                    if (this.state.correcta == 8){
+                      console.log("Ganaste")
+                      this.setState({gano:"visible"})
+                    }
+                      this.state.lastPick = -1
+                      
+                  } else {
+                    this.state.moving = false
+                    setTimeout(() => {
+                      this.voltearDeRegreso(this.state.lastPick,c-1)
+                    }, 1000);
+                    
+                  }
+                  
+                
+              }
+            }
+        }
         render() {
           const style = {
-            width: '1300px',
-            height: '700px',
-            position: 'relative',
+            width: '960px',
+            height: '740px',
             display: 'grid',
-            gridTemplateColumns: '20% 20% 20% 20% 20%',
-            gridTemplateRows: '50% 50%'
+            marginTop: '50px',
+            marginLeft: '50px',
+            gridTemplateColumns: '160px 160px 160px 160px 160px 160px' ,
+            gridTemplateRows: '33% 33% 33%',
+            alignSelf:'flexStart',
+            borderWidth: '0px'
+          }
+          const textStyle = {
+            color: 'white',
+            fontFamily: "matrix",
+            marginLeft: '50px',
+            letterSpacing: "2px"
+          }
+          const textStyle2 = {
+            color: 'white',
+            fontFamily: "matrix",
+            marginLeft: '50px',
+            letterSpacing: "2px",
+            visibility:`${this.state.gano}`
+          }
+          const image = {
+            visibility:`${this.state.gano}`
           }
           return (
-            <div style={style} tabIndex={0}>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
-              <Card value={this.state.values.splice(Math.floor(Math.random()*this.state.values.length), 1)}/>
+            <div>
+              <img src="YugiohLogo.gif"/> 
+              <img style={image} src="caiba.gif"/> 
+              <h1 style={textStyle2}>Ganaste !</h1>
+              <h1 style={textStyle}>{this.state.textoMovimientos}</h1>
+              <div style={style} tabIndex={0}>
+                <Card clicker={this.handleClick.bind(this, 1)} index={this.state.index[0]} value={this.state.values[0]} rotation={this.state.rotation[0]}/>
+                <Card clicker={this.handleClick.bind(this, 2)} index={this.state.index[1]} value={this.state.values[1]} rotation={this.state.rotation[1]}/>
+                <Card clicker={this.handleClick.bind(this, 3)} index={this.state.index[2]} value={this.state.values[2]} rotation={this.state.rotation[2]}/>
+                <Card clicker={this.handleClick.bind(this, 4)} index={this.state.index[3]} value={this.state.values[3]} rotation={this.state.rotation[3]}/>
+                <Card clicker={this.handleClick.bind(this, 5)} index={this.state.index[4]} value={this.state.values[4]} rotation={this.state.rotation[4]}/>
+                <Card clicker={this.handleClick.bind(this, 6)} index={this.state.index[5]} value={this.state.values[5]} rotation={this.state.rotation[5]}/>
+                <Card clicker={this.handleClick.bind(this, 7)} index={this.state.index[6]} value={this.state.values[6]} rotation={this.state.rotation[6]}/>
+                <Card clicker={this.handleClick.bind(this, 8)} index={this.state.index[7]} value={this.state.values[7]} rotation={this.state.rotation[7]}/>
+                <Card clicker={this.handleClick.bind(this, 9)} index={this.state.index[8]} value={this.state.values[8]} rotation={this.state.rotation[8]}/>
+                <Card clicker={this.handleClick.bind(this, 10)} index={this.state.index[9]} value={this.state.values[9]} rotation={this.state.rotation[9]}/>
+                <Card clicker={this.handleClick.bind(this, 11)} index={this.state.index[10]} value={this.state.values[10]} rotation={this.state.rotation[10]}/>
+                <Card clicker={this.handleClick.bind(this, 12)} index={this.state.index[11]} value={this.state.values[11]} rotation={this.state.rotation[11]}/>
+                <Card clicker={this.handleClick.bind(this, 13)} index={this.state.index[12]} value={this.state.values[12]} rotation={this.state.rotation[12]}/>
+                <Card clicker={this.handleClick.bind(this, 14)} index={this.state.index[13]} value={this.state.values[13]} rotation={this.state.rotation[13]}/>
+                <Card clicker={this.handleClick.bind(this, 15)} index={this.state.index[14]} value={this.state.values[14]} rotation={this.state.rotation[14]}/>
+                <Card clicker={this.handleClick.bind(this, 16)} index={this.state.index[15]} value={this.state.values[15]} rotation={this.state.rotation[15]}/>
+              </div>
             </div>
           )
         }
